@@ -11,7 +11,7 @@ def main():
     master.title("coordinate placer")
     master.withdraw()
 
-    filename = askopenfilename(filetypes=[("Image Files", "*.jpg;*.jpeg;*.png;*.gif;*.bmp")])
+    filename = askopenfilename()
     if not filename:
         sys.exit()
 
@@ -189,7 +189,7 @@ def main():
 
     canvas.bind("<Button-1>", place_point)  # left click to place point attached to nothing (or select existing point
     # so you can attach a new connection)
-    canvas.bind("<Button-3>", join_point)  # right click to place a point, joining it to the point placed previously
+    canvas.bind("<Button-2>", join_point)  # right click to place a point, joining it to the point placed previously
     # coordinates -> list of connections'
 
     text_field.focus_set()
