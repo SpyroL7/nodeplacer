@@ -1,28 +1,29 @@
-from main import main
 from tkinter import *
 from tkinter.filedialog import askopenfilename
 
-master = Tk()
-master.title("coordinate placer")
-master.withdraw()
 
-points = {}  # nodeId: ((x, y), [connections])
-rooms = {}
+def parse():
+    master = Tk()
+    master.title("coordinate placer")
+    master.withdraw()
 
-filename = askopenfilename()
-f = open(filename, "r")
-for line in f:
-    if line == "\n":
-        pass
-    elif line[-2] == ']':
-        parts = line.split(" ")
-        connections = list(map(lambda x : int(x.replace("[", "").replace(",", "").replace("]", "")), parts[4:]))
-        print(connections)
-        points[parts[0][:-1]] = ((int(parts[1][1:-1]), int(parts[2][:-1])), connections)
-    else:
-        parts = line.split(":")
-        rooms[parts[0]] = parts[1].strip()
+    points = {}  # nodeId: ((x, y), [connections])
+    rooms = {}
 
-
-print(points)
-print(rooms)
+    filename = askopenfilename()
+    f = open(filename, "r")
+    for line in f:
+        line = line.strip()
+        if "->" in line:
+            parts = line.split(" ")
+            if parts[4] == "[]":
+                connections = []
+            else:
+                connections = list(map(lambda x: int(x.replace("[", "").replace(",", "").replace("]", "")), parts[4:]))
+            points[parts[0][:-1]] = ((int(parts[1][1:-1]), int(parts[2][:-1])), connections)
+        elif line != "\n":
+            parts1 = line.split(":")
+            parts2 = parts1[1].strip().split(" ")
+            room_nodes = list(map(lambda x: int(x.replace("[", "").replace(",", "").replace("]", "")), parts2))
+            rooms[parts1[0][:-1]] = room_nodes
+    return points, rooms

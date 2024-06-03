@@ -27,10 +27,10 @@ def main():
 
     node = 0
     action_stack = deque()
-    prevNodes = deque()
+    prevNodes = deque()  # [(nodeId, x, y)]
 
     points = {}  # dict, nodeId: ((x, y), [connections])
-    rooms = {}  # dict, roomNo: nodeId
+    rooms = {}  # dict, roomNo: [nodeId]
 
     def place_point(event):
         nonlocal node
@@ -121,13 +121,19 @@ def main():
             print(f"{k}: {v}")
         print("-" * 10)
 
+    def print_node():
+        print(f"<{prevNodes[-1][0]}>")
+
     def undo():
         if action_stack:
             action = action_stack.pop()
             if len(action) == 2:
                 (text, t) = action
                 canvas.delete(t)
-                rooms.pop(text)
+                if len(rooms[text]) == 1:
+                    rooms.pop(text)
+                else:
+                    rooms[text].pop()
             else:
                 (n, point1, point2, line, connecting) = action
                 canvas.delete(point1)
@@ -152,7 +158,10 @@ def main():
             (prevNode, x, y) = prevNodes[-1]
             font = tkfont.Font(family="Arial", size=16, weight=tkfont.BOLD)
             t = canvas.create_text((x, y - 10), text=text, fill="green3", font=font)
-            rooms[text] = prevNode
+            if text in rooms:
+                rooms[text].append(prevNode)
+            else:
+                rooms[text] = [prevNode]
             text_field.delete(0, END)
             action_stack.append((text, t))
 
@@ -169,6 +178,13 @@ def main():
         command=print_points
     )
     print_button.pack(ipadx=5, ipady=5, side=LEFT)
+
+    print_node = Button(
+        master,
+        text='print selected node',
+        command=print_node
+    )
+    print_node.pack(ipadx=5, ipady=5, side=LEFT)
 
     undo_button = Button(
         master,
