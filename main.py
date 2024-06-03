@@ -18,12 +18,15 @@ def main():
     master.deiconify()
     image = Image.open(filename)
     width, height = image.size
-    master.geometry(f"{width}x{height + 50}")
+    master.geometry(f"{width + 200}x{height}")
     bg = ImageTk.PhotoImage(image)
 
     canvas = Canvas(master, width=width, height=height)
-    canvas.pack(fill="both", expand=True)
+    canvas.pack(side="left", fill="both", expand=True)
     canvas.create_image(0, 0, image=bg, anchor="nw")
+
+    button_frame = Frame(master)
+    button_frame.pack(side="right", fill="y")
 
     node = 0
     action_stack = deque()
@@ -166,47 +169,48 @@ def main():
             action_stack.append((text, t))
 
     choose_file = Button(
-        master,
+        button_frame,
         text='change map',
         command=relaunch
     )
-    choose_file.pack(ipadx=5, ipady=5, side=LEFT)
+    choose_file.pack(ipadx=5, ipady=5, side="top", fill="x")
 
     print_button = Button(
-        master,
+        button_frame,
         text='print nodes',
         command=print_points
     )
-    print_button.pack(ipadx=5, ipady=5, side=LEFT)
+    print_button.pack(ipadx=5, ipady=5, side="top", fill="x")
 
     print_node = Button(
-        master,
+        button_frame,
         text='print selected node',
         command=print_node
     )
-    print_node.pack(ipadx=5, ipady=5, side=LEFT)
+    print_node.pack(ipadx=5, ipady=5, side="top", fill="x")
 
     undo_button = Button(
-        master,
+        button_frame,
         text='undo',
         command=undo
     )
-    undo_button.pack(ipadx=5, ipady=5, side=LEFT)
+    undo_button.pack(ipadx=5, ipady=5, side="top", fill="x")
 
     room_button = Button(
-        master,
+        button_frame,
         text='assign to room',
         command=assign_room
     )
-    room_button.pack(ipadx=5, ipady=5, side=LEFT)
+    room_button.pack(ipadx=5, ipady=5, side="top", fill="x")
 
-    text_field = Entry(master, width=50)
-    text_field.pack(ipadx=5, ipady=5)
+    text_field = Entry(button_frame, width=50)
+    text_field.pack(ipadx=5, ipady=5, side="top", fill="x")
 
-    canvas.bind("<Button-1>", place_point)  # left click to place point attached to nothing (or select existing point
+    canvas.bind("<ButtonPress-1>", place_point)  # left click to place point attached to nothing (or select existing point
     # so you can attach a new connection)
     canvas.bind("<Button-2>", join_point)  # right click to place a point, joining it to the point placed previously
     # coordinates -> list of connections'
+
 
     text_field.focus_set()
     master.mainloop()
