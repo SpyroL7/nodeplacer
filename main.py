@@ -1,3 +1,4 @@
+from parseOutput import parse
 from collections import deque
 from tkinter import *
 from tkinter.filedialog import askopenfilename
@@ -127,6 +128,21 @@ def main():
     def print_node():
         print(f"<{prevNodes[-1][0]}>")
 
+    def import_nodes():
+        nonlocal points, rooms, node
+        while action_stack:
+            undo()
+        points, rooms = parse()
+        for p in points.values():
+            for con in p[1]:
+                (x1, y1) = p[0]
+                (x2, y2) = points[con][0]
+                canvas.create_line(x1, y1, x2, y2, width=5, fill="hotpink1")
+        for p in points.values():
+            (x, y) = p[0]
+            canvas.create_rectangle(x + 2, y + 2, x - 2, y - 2, fill="blue", outline="blue")
+        node = max(points.keys()) + 1
+
     def undo():
         if action_stack:
             action = action_stack.pop()
@@ -188,6 +204,13 @@ def main():
         command=print_node
     )
     print_node.pack(ipadx=5, ipady=5, side="top", fill="x")
+
+    import_button = Button(
+        button_frame,
+        text='import nodes',
+        command=import_nodes
+    )
+    import_button.pack(ipadx=5, ipady=5, side="top", fill="x")
 
     undo_button = Button(
         button_frame,
