@@ -1,6 +1,8 @@
-from parseOutput import parse
+from parseOutput import parseJson
+from saveJson import toJson
 from collections import deque
 from tkinter import *
+from tkinter.simpledialog import askstring
 from tkinter.filedialog import askopenfilename
 import tkinter.font as tkfont
 from PIL import Image, ImageTk
@@ -132,7 +134,8 @@ def main():
         nonlocal points, rooms, node
         while action_stack:
             undo()
-        points, rooms = parse()
+        # points, rooms = parse()
+        points, rooms = parseJson()
         for p in points.values():
             for con in p[1]:
                 (x1, y1) = p[0]
@@ -141,6 +144,11 @@ def main():
         for p in points.values():
             (x, y) = p[0]
             canvas.create_rectangle(x + 2, y + 2, x - 2, y - 2, fill="blue", outline="blue")
+        for (r, ns) in rooms.items():
+            for n in ns:
+                (x, y) = points[n][0]
+                font = tkfont.Font(family="Arial", size=16, weight=tkfont.BOLD)
+                t = canvas.create_text((x, y - 10), text=r, fill="green3", font=font)
         node = max(points.keys()) + 1
 
     def undo():
@@ -170,6 +178,10 @@ def main():
                     connections.remove(n)
                     (_, connections2) = points[n]
                     connections2.remove(prevNode)
+
+    def make_json():
+        filename = askstring(title="Create Json", prompt="JSON file name:")
+        toJson(points, rooms, filename)
 
     def assign_room():
         text = text_field.get()
@@ -218,6 +230,13 @@ def main():
         command=undo
     )
     undo_button.pack(ipadx=5, ipady=5, side="top", fill="x")
+
+    to_json = Button(
+        button_frame,
+        text='create json',
+        command=make_json
+    )
+    to_json.pack(ipadx=5, ipady=5, side="top", fill="x")
 
     room_button = Button(
         button_frame,

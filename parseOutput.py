@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter.filedialog import askopenfilename
+import json
 
 
 def parse():
@@ -26,5 +27,30 @@ def parse():
             parts2 = parts1[1].strip().split(" ")
             room_nodes = list(map(lambda x: int(x.replace("[", "").replace(",", "").replace("]", "")), parts2))
             rooms[parts1[0]] = room_nodes
+    f.close()
+    return points, rooms
+
+
+def parseJson():
+    master = Tk()
+    master.title("coordinate placer")
+    master.withdraw()
+
+    points = {}  # nodeId: ((x, y), [connections])
+    rooms = {}
+
+    filename = askopenfilename()
+    f = open(filename, "r")
+    data = json.load(f)
+
+    for node in data["nodes"]:
+        points[node["nodeId"]] = (tuple(node["coords"]), node["connections"])
+
+    for room in data["rooms"]:
+        rooms[room["roomName"]] = room["nodes"]
+
+
+    print(rooms)
+    print(points)
     f.close()
     return points, rooms
