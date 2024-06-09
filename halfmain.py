@@ -91,7 +91,7 @@ def main():
                     (_, connections2) = points[k]
                     connections2.append(prevNode)
                     n = k
-                    line = canvas.create_line(prevX, py2, 2, y2, width=5, fill="hotpink1")
+                    line = canvas.create_line(prevX, py2, x, y2, width=5, fill="hotpink1")
                     connecting = True
                     prevNodes.append((k, x, y))
                     break
@@ -206,7 +206,7 @@ def main():
         if text != "":
             (prevNode, x, y) = prevNodes[-1]
             font = tkfont.Font(family="Arial", size=16, weight=tkfont.BOLD)
-            t = canvas.create_text((x, y - 10), text=text, fill="green3", font=font)
+            t = canvas.create_text((x, y - 10 - height // 2), text=text, fill="green3", font=font)
             if text in rooms:
                 rooms[text].append(prevNode)
             else:
