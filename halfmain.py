@@ -19,13 +19,10 @@ def main():
         sys.exit()
 
     master.deiconify()
-    # master.tk.call('tk', 'scaling', 2.0)
     image = Image.open(filename)
     width, height = image.size
     # half = image.crop((0, 0, width, height//2))
-    half = image.crop((0, height//2, width, height))
-    # new_width = width // 1.5
-    # new_height = height // 1.5
+    half = image.crop((0, height//2, width, height))  # bottom half
 
     # Resize the image
     # resized_image = image.resize((new_width, new_height), Image.LANCZOS)
@@ -54,21 +51,20 @@ def main():
         event.y = event.y + height // 2
         if prevNodes:
             prevNode, prevX, prevY = prevNodes[-1]
-            point1 = canvas.create_rectangle(prevX + 2, prevY + 2, prevX - 2, prevY - 2, fill="blue", outline="blue")
+            py2 = prevY - height // 2
+            point1 = canvas.create_rectangle(prevX + 2, py2 + 2, prevX - 2, py2 - 2, fill="blue", outline="blue")
         for (k, ((x, y), z)) in points.items():
             if abs(x - event.x) < 7 and abs(y - event.y) < 7:
-                x2 = x
                 y2 = y - height // 2
-                point2 = canvas.create_rectangle(x2 + 2, y2 + 2, x2 - 2, y2 - 2, fill=color, outline=color)
+                point2 = canvas.create_rectangle(x + 2, y2 + 2, x - 2, y2 - 2, fill=color, outline=color)
                 connecting = True
                 prevNodes.append((k, x, y))
                 n = k
                 break
         if not connecting:
             n = node
-            x2 = event.x
             y2 = event.y - height // 2
-            point2 = canvas.create_rectangle(x2 + 2, y2 + 2, x2 - 2, y2 - 2, fill=color,
+            point2 = canvas.create_rectangle(event.x + 2, y2 + 2, event.x - 2, y2 - 2, fill=color,
                                              outline=color)
             points[node] = ((event.x, event.y), [])
             prevNodes.append((node, event.x, event.y))
@@ -78,7 +74,6 @@ def main():
     def join_point(event):
         nonlocal node
         n = node
-        event.x = event.x
         event.y = event.y + height // 2
         if prevNodes:
             prevNode, prevX, prevY = prevNodes[-1]
@@ -86,48 +81,44 @@ def main():
             connecting = False
             for (k, ((x, y), z)) in points.items():
                 if abs(x - event.x) < 7 and abs(y - event.y) < 7:
-                    x2 = x
                     y2 = y - height // 2
-                    px2 = prevX
                     py2 = prevY - height // 2
-                    point1 = canvas.create_rectangle(px2 + 2, py2 + 2, px2 - 2, py2 - 2, fill="blue",
+                    point1 = canvas.create_rectangle(prevX + 2, py2 + 2, prevX - 2, py2 - 2, fill="blue",
                                                      outline="blue")
-                    point2 = canvas.create_rectangle(x2 + 2, y2 + 2, x2 - 2, y2 - 2, fill=color, outline=color)
+                    point2 = canvas.create_rectangle(x + 2, y2 + 2, x - 2, y2 - 2, fill=color, outline=color)
                     (_, connections) = points[prevNode]
                     connections.append(k)
                     (_, connections2) = points[k]
                     connections2.append(prevNode)
                     n = k
-                    line = canvas.create_line(px2, py2, x2, y2, width=5, fill="hotpink1")
+                    line = canvas.create_line(prevX, py2, 2, y2, width=5, fill="hotpink1")
                     connecting = True
                     prevNodes.append((k, x, y))
                     break
             if not connecting:
-                x2 = event.x
                 y2 = event.y - height // 2
-                px2 = prevX
                 py2 = prevY - height // 2
                 if abs(prevX - event.x) < 7:
-                    line = canvas.create_line(px2, py2, px2, y2, width=5, fill="hotpink1")
-                    point1 = canvas.create_rectangle(px2 + 2, py2 + 2, px2 - 2, py2 - 2, fill="blue",
+                    line = canvas.create_line(prevX, py2, prevX, y2, width=5, fill="hotpink1")
+                    point1 = canvas.create_rectangle(prevX + 2, py2 + 2, prevX - 2, py2 - 2, fill="blue",
                                                      outline="blue")
-                    point2 = canvas.create_rectangle(px2 + 2, y2 + 2, px2 - 2, y2 - 2, fill=color,
+                    point2 = canvas.create_rectangle(prevX + 2, y2 + 2, prevX - 2, y2 - 2, fill=color,
                                                      outline=color)
                     prevY = event.y
                     points[node] = ((prevX, event.y), [prevNode])
                 elif abs(prevY - event.y) < 7:
-                    line = canvas.create_line(px2, py2, x2, py2, width=5, fill="hotpink1")
-                    point1 = canvas.create_rectangle(px2 + 2, py2 + 2, px2 - 2, py2 - 2, fill="blue",
+                    line = canvas.create_line(prevX, py2, event.x, py2, width=5, fill="hotpink1")
+                    point1 = canvas.create_rectangle(prevX + 2, py2 + 2, prevX - 2, py2 - 2, fill="blue",
                                                      outline="blue")
-                    point2 = canvas.create_rectangle(x2 + 2, py2 + 2, x2 - 2, py2 - 2, fill=color,
+                    point2 = canvas.create_rectangle(event.x + 2, py2 + 2, event.x - 2, py2 - 2, fill=color,
                                                      outline=color)
                     prevX = event.x
                     points[node] = ((event.x, prevY), [prevNode])
                 else:
-                    line = canvas.create_line(px2, py2, x2, y2, width=5, fill="hotpink1")
-                    point1 = canvas.create_rectangle(px2 + 2, py2 + 2, px2 - 2, py2 - 2, fill="blue",
+                    line = canvas.create_line(prevX, py2, event.x, y2, width=5, fill="hotpink1")
+                    point1 = canvas.create_rectangle(prevX + 2, py2 + 2, prevX - 2, py2 - 2, fill="blue",
                                                      outline="blue")
-                    point2 = canvas.create_rectangle(x2 + 2, y2 + 2, x2 - 2, y2 - 2, fill=color,
+                    point2 = canvas.create_rectangle(event.x + 2, y2 + 2, event.x - 2, y2 - 2, fill=color,
                                                      outline=color)
                     prevX, prevY = event.x, event.y
                     points[node] = ((event.x, event.y), [prevNode])
@@ -280,10 +271,6 @@ def main():
     canvas.bind("<Button-2>", join_point)  # right click to place a point, joining it to the point placed previously
     # coordinates -> list of connections'
 
-    HEIGHT = master.winfo_screenwidth()
-    WIDTH = master.winfo_screenheight()
-    RESOL = str(HEIGHT) + "x" + str(WIDTH + 7) + "+" + str(-7) + "+" + str(0)
-    master.geometry(RESOL)
     text_field.focus_set()
     master.mainloop()
 
